@@ -94,7 +94,7 @@ const loginUser = async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "lax",
       })
       .json({
@@ -117,12 +117,12 @@ const loginUser = async (req, res) => {
 };
 
 //logout
-const logoutUser=async(req,res,next)=>{
+const logoutUser = async (req, res, next) => {
   res.clearCookie("token").json({
-    success:true,
-    message:"logged out successfully",
-  })
-}
+    success: true,
+    message: "logged out successfully",
+  });
+};
 
 //auth middleware
 const authMiddleware = async (req, res, next) => {
@@ -145,6 +145,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-
-
-module.exports = { registerUser, loginUser,logoutUser ,authMiddleware};
+module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
