@@ -17,7 +17,7 @@ import CheckAuth from "./components/common/checkauth";
 import UnauthPage from "./pages/unauth-page";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { checkAuth } from "./store/auth-slice";
+import { checkAuth, setLoadingFalse } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shop/paypal-return";
 import PaymentSuccessPage from "./pages/shop/payment-success";
@@ -31,7 +31,24 @@ function App() {
   console.log(isAuthenticated);
 
   useEffect(() => {
-    dispatch(checkAuth());
+    try {
+      const token = JSON.parse(sessionStorage.getItem("token"));
+      console.log("Token from sessionStorage:", token);
+
+      if (token && token !== null) {
+        // Only call checkAuth if token exists and is not null
+        dispatch(checkAuth(token));
+      } else {
+        // If no token or token is null, stop loading immediately
+        console.log("No valid token found, stopping loading");
+        dispatch(setLoadingFalse());
+      }
+    } catch (error) {
+      // If JSON.parse fails, clear invalid token and stop loading
+      console.log("Invalid token format, clearing and stopping loading");
+      sessionStorage.removeItem("token");
+      dispatch(setLoadingFalse());
+    }
   }, [dispatch]);
 
   if (isLoading) {

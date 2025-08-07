@@ -91,22 +91,33 @@ const loginUser = async (req, res) => {
     // console.log(token);
 
     // console.log(checkUser.role);
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-      })
-      .json({
-        success: true,
-        message: "Logged in SuccessFully",
-        user: {
-          email: checkUser.email,
-          id: checkUser._id,
-          role: checkUser.role,
-          userName: checkUser.userName,
-        },
-      });
+    // res
+    //   .cookie("token", token, {
+    //     httpOnly: true,
+    //     secure: true,
+    //     sameSite: "lax",
+    //   })
+    //   .json({
+    //     success: true,
+    //     message: "Logged in SuccessFully",
+    //     user: {
+    //       email: checkUser.email,
+    //       id: checkUser._id,
+    //       role: checkUser.role,
+    //       userName: checkUser.userName,
+    //     },
+    //   });
+    res.status(200).json({
+      success: true,
+      message: "Logged in Successfull",
+      token,
+      user: {
+        email: checkUser.email,
+        id: checkUser._id,
+        role: checkUser.role,
+        userName: checkUser.userName,
+      },
+    });
   } catch (e) {
     // console.log(e);
     res.status(500).json({
@@ -125,8 +136,30 @@ const logoutUser = async (req, res, next) => {
 };
 
 //auth middleware
+// const authMiddleware = async (req, res, next) => {
+//   const token = req.cookies.token;
+//   if (!token)
+//     return res.status(401).json({
+//       success: false,
+//       message: "Unauthorised user!",
+//     });
+
+//   try {
+//     const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+//     req.user = decoded;
+//     next();
+//   } catch (error) {
+//     res.status(401).json({
+//       success: false,
+//       message: "Unauthorised user!",
+//     });
+//   }
+// };
+
 const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
   if (!token)
     return res.status(401).json({
       success: false,

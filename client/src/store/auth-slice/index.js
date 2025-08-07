@@ -7,14 +7,8 @@ const initialState = {
   isAuthenticated: false,
   isLoading: true,
   user: null,
+  token: null,
 };
-
-/*
-Thunk in Redux is used to handle asynchronous logic (like API calls) inside Redux actions.
-Normally, Redux actions must be plain objects and can’t contain async code.
-With thunk middleware, you can write action creators that return a function (a "thunk") instead of an action object.
-This function can perform async operations and then dispatch actions when the async work is done.
-*/
 
 export const registerUser = createAsyncThunk(
   "/auth/register",
@@ -25,8 +19,6 @@ export const registerUser = createAsyncThunk(
         formData,
         {
           withCredentials: true,
-
-          //This ensures any cookies set by your backend (like Set-Cookie) are sent and received properly.
         }
       );
       return response.data;
@@ -35,14 +27,13 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
 export const loginUser = createAsyncThunk(
   "/auth/login",
   async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, formData, {
         withCredentials: true,
-
-        //This ensures any cookies set by your backend (like Set-Cookie) are sent and received properly.
       });
       return response.data;
     } catch (err) {
@@ -53,43 +44,59 @@ export const loginUser = createAsyncThunk(
 
 export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
-  async (_, { rejectWithValue }) => {
-    // Add the second parameter
+  async (token, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/api/auth/check-auth`, {
         withCredentials: true,
         headers: {
+          Authorization: `Bearer ${token}`,
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
       });
       return response.data;
     } catch (error) {
-      // This prevents the ZodError on first visit
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
-export const logoutUser = createAsyncThunk("/auth/logout", async () => {
-  {
-    const response = await axios.post(
-      `${API_URL}/api/auth/logout`,
-      {},
-      {
-        withCredentials: true,
 
-        //This ensures any cookies set by your backend (like Set-Cookie) are sent and received properly.
-      }
-    );
-    return response.data;
+export const logoutUser = createAsyncThunk(
+  "/auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-});
+);
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {},
+    setUser: (state, action) => {
+      state.user = action.payload.user;
+      state.isAuthenticated = true;
+      state.isLoading = false;
+    },
+    resetTokenAndCredentials: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      sessionStorage.removeItem("token");
+    },
+    setLoadingFalse: (state) => {
+      state.isLoading = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -110,49 +117,61 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        // console.log(action.payload);
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
+        state.token = action.payload.token;
+        if (action.payload.token) {
+          sessionStorage.setItem("token", JSON.stringify(action.payload.token));
+        }
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.token = null;
+        sessionStorage.removeItem("token");
       })
       .addCase(checkAuth.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        console.log(action.payload);
+        console.log("checkAuth fulfilled:", action.payload);
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
       })
-      .addCase(checkAuth.rejected, (state) => {
+      .addCase(checkAuth.rejected, (state, action) => {
+        console.log("checkAuth rejected:", action.payload);
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        // Only clear token if it's truly invalid
+        if (
+          action.payload &&
+          action.payload.message?.includes("Unauthorised")
+        ) {
+          state.token = null;
+          sessionStorage.removeItem("token");
+        }
       })
-      .addCase(logoutUser.fulfilled, (state, ) => {
+      .addCase(logoutUser.fulfilled, (state) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.token = null;
+        sessionStorage.removeItem("token");
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.token = null;
+        sessionStorage.removeItem("token");
       });
   },
 });
-export const { setUser } = authSlice.actions;
+
+export const { setUser, resetTokenAndCredentials, setLoadingFalse } =
+  authSlice.actions;
 export default authSlice.reducer;
-
-/*
-Why are extraReducers used?
-extraReducers in Redux Toolkit's createSlice are used to handle actions that are not defined in the slice's own reducers.
-Most commonly, they are used to handle the different states (pending, fulfilled, rejected) of async thunks like createAsyncThunk.
-
-For example, when you use registerUser, Redux Toolkit automatically creates actions for:
-
-registerUser/pending
-registerUser/fulfilled
-registerUser/rejected
-You use extraReducers to tell your slice how to update the state when these actions happen.
-*/
