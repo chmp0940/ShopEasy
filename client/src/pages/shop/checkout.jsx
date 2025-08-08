@@ -32,7 +32,8 @@ function ShoppingCheckout() {
   function handleInitiatePaypalPayment() {
     if (cartItems.items.length === 0) {
       toast({
-        title: "You Cart is Empty Please. Add Products to procees",
+        title: "Your cart is empty",
+        description: "Please add products to proceed with checkout.",
         variant: "destructive",
       });
       return;
@@ -40,7 +41,8 @@ function ShoppingCheckout() {
 
     if (currentSelectedAddress === null) {
       toast({
-        title: "Please selct one address to process",
+        title: "Address required",
+        description: "Please select a delivery address to continue.",
         variant: "destructive",
       });
       return;

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -79,11 +80,40 @@ const shoppingOrderSlice = createSlice({
           "currentOrderId",
           JSON.stringify(action.payload.orderId)
         );
+        toast({
+          title: "Order created successfully!",
+          description: "Redirecting to payment...",
+          className: "bg-green-500 text-white",
+        });
       })
       .addCase(createNewOrder.rejected, (state) => {
         state.isLoading = false;
         state.approvalUrl = null;
         state.orderId = null;
+        toast({
+          title: "Failed to create order",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      })
+      .addCase(capturePayment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(capturePayment.fulfilled, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Payment successful!",
+          description: "Your order has been confirmed.",
+          className: "bg-green-500 text-white",
+        });
+      })
+      .addCase(capturePayment.rejected, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Payment failed",
+          description: "Please try again or contact support.",
+          variant: "destructive",
+        });
       })
       .addCase(getAllOrderByUserId.pending, (state) => {
         state.isLoading = true;
@@ -95,6 +125,11 @@ const shoppingOrderSlice = createSlice({
       .addCase(getAllOrderByUserId.rejected, (state) => {
         state.isLoading = false;
         state.orderList = [];
+        toast({
+          title: "Failed to load orders",
+          description: "Please refresh the page and try again.",
+          variant: "destructive",
+        });
       })
       .addCase(getOrderDetails.pending, (state) => {
         state.isLoading = true;
@@ -106,6 +141,11 @@ const shoppingOrderSlice = createSlice({
       .addCase(getOrderDetails.rejected, (state) => {
         state.isLoading = false;
         state.orderDetails = [];
+        toast({
+          title: "Failed to load order details",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       });
   },
 });

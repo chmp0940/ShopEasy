@@ -1,13 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteAddress,
-  editAddress,
-  fetchAllAddress,
-} from "@/store/shop/address-slice";
+import { deleteAddress, fetchAllAddress } from "@/store/shop/address-slice";
 
 function AddressCart({
   addressInfo,
@@ -32,8 +28,9 @@ function AddressCart({
       })
     ).then((data) => {
       // console.log(data);
-
-      dispatch(fetchAllAddress(user?.id));
+      if (data?.payload?.success) {
+        dispatch(fetchAllAddress(user?.id));
+      }
     });
   }
 

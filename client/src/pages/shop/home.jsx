@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import ProductDetailsDialog from "./product-details";
 import { getFeatureImage } from "@/store/common-slice";
+import { useToast } from "@/hooks/use-toast";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -109,6 +110,7 @@ function ShoppingHome() {
   const { user } = useSelector((state) => state.auth);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { featureImageList } = useSelector((state) => state.commonFeature);
+  const { toast } = useToast();
 
   // Use dynamic slides array
   const slides =
@@ -168,6 +170,12 @@ function ShoppingHome() {
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
     navigate(`/shop/listing`);
+
+    toast({
+      title: `Browsing ${getCurrentItem.label}`,
+      description: `Showing all ${getCurrentItem.label.toLowerCase()} products`,
+      className: "bg-blue-500 text-white",
+    });
   }
 
   function handleGetProductDetails(getCurrentProductId) {

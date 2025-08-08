@@ -5,11 +5,13 @@ import UserCartItemsContent from "./cart-items-content";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "@/hooks/use-toast";
 
 function UserCartWrapper({ cartItems, setOpenCartSheet }) {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const { toast } = useToast();
 
   const totalCartAmount =
     cartItems && cartItems.length > 0
@@ -70,8 +72,15 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
       <Button
         className="w-full mt-4  bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={() => {
-          navigate("/shop/checkout");
-          setOpenCartSheet(false);
+          if (cartItems && cartItems.length > 0) {
+            navigate("/shop/checkout");
+            setOpenCartSheet(false);
+            toast({
+              title: "Proceeding to checkout",
+              description: "Please complete your order details.",
+              className: "bg-blue-500 text-white",
+            });
+          }
         }}
         disabled={!cartItems || cartItems.length === 0}
       >

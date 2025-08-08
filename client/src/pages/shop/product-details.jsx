@@ -66,7 +66,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     if (user?.id) {
       dispatch(fetchCartItems(user?.id));
     }
-  }, [dispatch]);
+  }, [dispatch, user?.id]);
 
   function handleDialogClose() {
     setOpen(false);
@@ -93,10 +93,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         setReviewMsg("");
 
         dispatch(getReviews(productDetails?._id));
-        toast({
-          title: "Product Reviewed Successfully",
-          className: "bg-green-500",
-        });
       }
     });
   }
@@ -105,7 +101,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     if (productDetails != null) {
       dispatch(getReviews(productDetails?._id));
     }
-  }, [productDetails]);
+  }, [productDetails, dispatch]);
 
   console.log(reviews);
 

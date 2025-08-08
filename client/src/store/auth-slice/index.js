@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -107,11 +108,21 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        toast({
+          title: "Registration successful!",
+          description: "Please login with your credentials.",
+          className: "bg-green-500 text-white",
+        });
       })
-      .addCase(registerUser.rejected, (state) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        toast({
+          title: "Registration failed",
+          description: action.payload?.message || "Please try again later.",
+          variant: "destructive",
+        });
       })
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
@@ -124,13 +135,26 @@ const authSlice = createSlice({
         if (action.payload.token) {
           sessionStorage.setItem("token", JSON.stringify(action.payload.token));
         }
+        if (action.payload.success) {
+          toast({
+            title: "Welcome back!",
+            description: `Hello ${action.payload.user?.userName}, you're successfully logged in.`,
+            className: "bg-green-500 text-white",
+          });
+        }
       })
-      .addCase(loginUser.rejected, (state) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.token = null;
         sessionStorage.removeItem("token");
+        toast({
+          title: "Login failed",
+          description:
+            action.payload?.message || "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
       })
       .addCase(checkAuth.pending, (state) => {
         state.isLoading = true;
@@ -161,6 +185,11 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.token = null;
         sessionStorage.removeItem("token");
+        toast({
+          title: "Logged out successfully",
+          description: "See you next time!",
+          className: "bg-blue-500 text-white",
+        });
       })
       .addCase(logoutUser.rejected, (state) => {
         state.isLoading = false;
@@ -168,6 +197,11 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.token = null;
         sessionStorage.removeItem("token");
+        toast({
+          title: "Logged out",
+          description: "You have been logged out.",
+          className: "bg-blue-500 text-white",
+        });
       });
   },
 });

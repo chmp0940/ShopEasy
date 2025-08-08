@@ -18,6 +18,7 @@ import { logoutUser, resetTokenAndCredentials } from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -58,11 +59,18 @@ function HeaderRightContent() {
   const dispatch = useDispatch();
   const [openCartSheet, setOpenCartSheet] = useState(false);
   const { cartItems } = useSelector((state) => state.shopCart);
+  const { toast } = useToast();
+
   function handleLogout() {
     // dispatch(logoutUser());
     dispatch(resetTokenAndCredentials());
     sessionStorage.clear();
     navigate("/auth/login");
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out. See you next time!",
+      className: "bg-blue-500 text-white",
+    });
   }
   useEffect(() => {
     if (user && user?._id) {

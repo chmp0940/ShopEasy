@@ -127,7 +127,7 @@ function ShoppingListing() {
       const createQueryString = createSearchParamsHelper(filters);
       setSearchParams(new URLSearchParams(createQueryString));
     }
-  }, [filters]);
+  }, [filters, setSearchParams]);
   /*
 
 
@@ -275,7 +275,7 @@ function ShoppingListing() {
     if (user?.id) {
       dispatch(fetchCartItems(user?.id));
     }
-  }, [dispatch]);
+  }, [dispatch, user?.id]);
 
   // console.log(productList);
 

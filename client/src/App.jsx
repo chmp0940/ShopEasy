@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PaypalReturnPage from "./pages/shop/paypal-return";
 import PaymentSuccessPage from "./pages/shop/payment-success";
 import SearchProducts from "./pages/shop/search";
+import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   const { isAuthenticated, user, isLoading } = useSelector(
@@ -59,62 +60,71 @@ function App() {
     );
   }
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <CheckAuth isAuthenticated={isAuthenticated} user={user}></CheckAuth>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <CheckAuth isAuthenticated={isAuthenticated} user={user}></CheckAuth>
-        }
-      />
-      <Route
-        path="auth"
-        element={
-          <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-            <AuthLayout />
-          </CheckAuth>
-        }
-      >
-        <Route path="login" element={<AuthLogin />} />
-        <Route path="register" element={<AuthRegister />} />
-      </Route>
-      <Route
-        path="/admin"
-        element={
-          <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-            <AdminLayout />
-          </CheckAuth>
-        }
-      >
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="products" element={<AdminProducts />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="features" element={<AdminFeatures />} />
-      </Route>
-      <Route
-        path="/shop"
-        element={
-          <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-            <ShoppingLayout />
-          </CheckAuth>
-        }
-      >
-        <Route path="account" element={<ShoppingAccount />} />
-        <Route path="checkout" element={<ShoppingCheckout />} />
-        <Route path="home" element={<ShoppingHome />} />
-        <Route path="listing" element={<ShoppingListing />} />
-        <Route path="paypal-return" element={<PaypalReturnPage />} />
-        <Route path="payment-success" element={<PaymentSuccessPage />} />
-        <Route path="search" element={<SearchProducts />} />
-      </Route>
-      <Route path="/unauth-page" element={<UnauthPage />} />
-      <Route path="*" element={<Notfound />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <CheckAuth
+              isAuthenticated={isAuthenticated}
+              user={user}
+            ></CheckAuth>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <CheckAuth
+              isAuthenticated={isAuthenticated}
+              user={user}
+            ></CheckAuth>
+          }
+        />
+        <Route
+          path="auth"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <AuthLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="login" element={<AuthLogin />} />
+          <Route path="register" element={<AuthRegister />} />
+        </Route>
+        <Route
+          path="/admin"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <AdminLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="features" element={<AdminFeatures />} />
+        </Route>
+        <Route
+          path="/shop"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <ShoppingLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="account" element={<ShoppingAccount />} />
+          <Route path="checkout" element={<ShoppingCheckout />} />
+          <Route path="home" element={<ShoppingHome />} />
+          <Route path="listing" element={<ShoppingListing />} />
+          <Route path="paypal-return" element={<PaypalReturnPage />} />
+          <Route path="payment-success" element={<PaymentSuccessPage />} />
+          <Route path="search" element={<SearchProducts />} />
+        </Route>
+        <Route path="/unauth-page" element={<UnauthPage />} />
+        <Route path="*" element={<Notfound />} />
+      </Routes>
+      <Toaster />
+    </>
   );
 }
 

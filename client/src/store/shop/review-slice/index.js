@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,6 +26,25 @@ const reviewSLice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(addReview.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addReview.fulfilled, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Review added successfully!",
+          description: "Thank you for your feedback.",
+          className: "bg-green-500 text-white",
+        });
+      })
+      .addCase(addReview.rejected, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Failed to add review",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      })
       .addCase(getReviews.pending, (state) => {
         state.isLoading = true;
       })
@@ -35,6 +55,11 @@ const reviewSLice = createSlice({
       .addCase(getReviews.rejected, (state) => {
         state.isLoading = false;
         state.reviews = [];
+        toast({
+          title: "Failed to load reviews",
+          description: "Please refresh and try again.",
+          variant: "destructive",
+        });
       });
   },
 });

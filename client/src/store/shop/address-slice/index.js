@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -62,13 +63,23 @@ const addressSlice = createSlice({
       .addCase(addNewAddress.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addNewAddress.fulfilled, (state, ) => {
+      .addCase(addNewAddress.fulfilled, (state) => {
         // console.log(action.payload.data);
 
         state.isLoading = false;
+        toast({
+          title: "Address added successfully!",
+          description: "Your new address has been saved.",
+          className: "bg-green-500 text-white",
+        });
       })
       .addCase(addNewAddress.rejected, (state) => {
         state.isLoading = false;
+        toast({
+          title: "Failed to add address",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       })
       .addCase(fetchAllAddress.pending, (state) => {
         state.isLoading = true;
@@ -80,6 +91,49 @@ const addressSlice = createSlice({
       .addCase(fetchAllAddress.rejected, (state) => {
         state.isLoading = false;
         state.addressList = [];
+        toast({
+          title: "Failed to load addresses",
+          description: "Please refresh the page and try again.",
+          variant: "destructive",
+        });
+      })
+      .addCase(editAddress.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(editAddress.fulfilled, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Address updated successfully!",
+          description: "Your address has been updated.",
+          className: "bg-blue-500 text-white",
+        });
+      })
+      .addCase(editAddress.rejected, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Failed to update address",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      })
+      .addCase(deleteAddress.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteAddress.fulfilled, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Address deleted successfully!",
+          description: "The address has been removed.",
+          className: "bg-orange-500 text-white",
+        });
+      })
+      .addCase(deleteAddress.rejected, (state) => {
+        state.isLoading = false;
+        toast({
+          title: "Failed to delete address",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       });
   },
 });

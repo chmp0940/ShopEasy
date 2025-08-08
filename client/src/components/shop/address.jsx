@@ -44,11 +44,6 @@ function Address({ setCurrentSelectedState, selectedId }) {
           dispatch(fetchAllAddress(user?.id));
           setFormData(initialAddressFormData);
           setCurrentEditedId(null);
-          toast({
-            title: "Success",
-            description: "Address updated successfully!",
-            className: "bg-green-400",
-          });
         }
       });
     } else {
@@ -70,10 +65,6 @@ function Address({ setCurrentSelectedState, selectedId }) {
         if (data?.payload?.success) {
           dispatch(fetchAllAddress(user?.id));
           setFormData(initialAddressFormData);
-          toast({
-            title: "Success",
-            description: "Address added successfully!",
-          });
         }
       });
     }

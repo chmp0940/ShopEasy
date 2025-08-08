@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -61,10 +62,20 @@ const shopppingCartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cartItems = action.payload.data;
+        toast({
+          title: "Product added to cart!",
+          description: "You can view it in your cart.",
+          className: "bg-green-500 text-white",
+        });
       })
       .addCase(addToCart.rejected, (state) => {
         state.isLoading = false;
         state.cartItems = [];
+        toast({
+          title: "Failed to add to cart",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       })
       .addCase(fetchCartItems.pending, (state) => {
         state.isLoading = true;
@@ -77,6 +88,11 @@ const shopppingCartSlice = createSlice({
       .addCase(fetchCartItems.rejected, (state) => {
         state.isLoading = false;
         state.cartItems = [];
+        toast({
+          title: "Failed to load cart",
+          description: "Please refresh the page and try again.",
+          variant: "destructive",
+        });
       })
       .addCase(updateCartQuantity.pending, (state) => {
         state.isLoading = true;
@@ -84,10 +100,20 @@ const shopppingCartSlice = createSlice({
       .addCase(updateCartQuantity.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cartItems = action.payload.data;
+        toast({
+          title: "Cart updated!",
+          description: "Product quantity has been updated.",
+          className: "bg-blue-500 text-white",
+        });
       })
       .addCase(updateCartQuantity.rejected, (state) => {
         state.isLoading = false;
         state.cartItems = [];
+        toast({
+          title: "Failed to update cart",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       })
       .addCase(deleteCartItems.pending, (state) => {
         state.isLoading = true;
@@ -95,10 +121,20 @@ const shopppingCartSlice = createSlice({
       .addCase(deleteCartItems.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cartItems = action.payload.data;
+        toast({
+          title: "Product removed from cart",
+          description: "The item has been successfully removed.",
+          className: "bg-orange-500 text-white",
+        });
       })
       .addCase(deleteCartItems.rejected, (state) => {
         state.isLoading = false;
         state.cartItems = [];
+        toast({
+          title: "Failed to remove item",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
       });
   },
 });
