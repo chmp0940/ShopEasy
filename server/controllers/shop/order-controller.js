@@ -1,7 +1,7 @@
 const paypal = require("../../helpers/paypal");
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
-const Product=require("../../models/Product");
+const Product = require("../../models/Product");
 
 const createOrder = async (req, res) => {
   try {
@@ -21,7 +21,6 @@ const createOrder = async (req, res) => {
     } = req.body;
 
     console.log(userId);
-    
 
     const create_payment_json = {
       intent: "sale",
@@ -29,8 +28,12 @@ const createOrder = async (req, res) => {
         payment_method: "paypal",
       },
       redirect_urls: {
-        return_url: "http://localhost:5173/shop/paypal-return",
-        cancel_url: "http://localhost:5173/shop/paypal-cancel",
+        return_url: `${
+          process.env.CLIENT_BASE_URL || "http://localhost:5173"
+        }/shop/paypal-return`,
+        cancel_url: `${
+          process.env.CLIENT_BASE_URL || "http://localhost:5173"
+        }/shop/paypal-cancel`,
       },
       transactions: [
         {
@@ -112,28 +115,23 @@ const capturePayment = async (req, res) => {
     order.paymentId = paymentId;
     order.payerId = payerId;
 
+    for (let item of order.cartItems) {
+      let product = await Product.findById(item.productId);
 
-    for(let item of order.cartItems)
-    {
-      let product =await Product.findById(item.productId);
-
-      if(!product)
-      {
+      if (!product) {
         return res.status(401).json({
-          success:false,
-          message:`Not Enough Stock for this product ${product.title}`
-        })
+          success: false,
+          message: `Not Enough Stock for this product ${product.title}`,
+        });
       }
 
-      product.totalStock-=item.quantity;
+      product.totalStock -= item.quantity;
       await product.save();
     }
 
     await order.save();
     const getCartID = order.cartId;
     await Cart.findByIdAndDelete(getCartID);
-
-
 
     res.status(200).json({
       success: true,
@@ -153,12 +151,11 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
     console.log(userId);
-    
-// console.log(userId);
 
-    const orders = await Order.find({userId} );
+    // console.log(userId);
+
+    const orders = await Order.find({ userId });
     // console.log(orders);
-    
 
     if (!orders.length) {
       return res.status(404).json({
@@ -208,5 +205,5 @@ module.exports = {
   createOrder,
   capturePayment,
   getAllOrdersByUser,
-  getOrderDetails
+  getOrderDetails,
 };
