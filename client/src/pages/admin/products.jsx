@@ -110,17 +110,23 @@ function AdminProducts() {
 
   return (
     <>
-      {/* Only show Add Product button for admins */}
-      {!isViewer && (
-        <div className="mb-5 flex justify-end w-full">
-          <Button
-            onClick={() => setOpenCreateProductsDialog(true)}
-            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-          >
-            Add new Product
-          </Button>
-        </div>
-      )}
+      <div className="mb-5 flex justify-end w-full">
+        <Button
+          onClick={() => {
+            setOpenCreateProductsDialog(true);
+            if (isViewer) {
+              toast({
+                title: "👁 View Only Mode",
+                description: "You can only view this form. Editing is not allowed.",
+                className: "bg-violet-500 text-white",
+              });
+            }
+          }}
+          className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+        >
+          Add new Product
+        </Button>
+      </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
         {productList && productList.length > 0
           ? productList.map((productItem) => (
@@ -136,23 +142,31 @@ function AdminProducts() {
           : null}
       </div>
       {/* // Product List rahegi yaha pe  */}
-      {/* Only render the Sheet for admins */}
-      {!isViewer && (
-        <Sheet
-          open={openCreateProductsDialog}
-          onOpenChange={() => {
-            setCurrentEditedId(null);
-            setFormData(initialFormData);
-            // actually whats happening is that when edit is click then it will show its current items right but when we click the add new button the same thigns get there also as we didn't reset the form so therefore this two are used
-            setOpenCreateProductsDialog(false);
-          }}
-        >
-          <SheetContent side="right" className="overflow-auto">
-            <SheetHeader>
-              <SheetTitle className="text-violet-800">
-                {currentEditedId != null ? "Edit Product" : "Add New Product"}
-              </SheetTitle>
-            </SheetHeader>
+      <Sheet
+        open={openCreateProductsDialog}
+        onOpenChange={() => {
+          setCurrentEditedId(null);
+          setFormData(initialFormData);
+          // actually whats happening is that when edit is click then it will show its current items right but when we click the add new button the same thigns get there also as we didn't reset the form so therefore this two are used
+          setOpenCreateProductsDialog(false);
+        }}
+      >
+        <SheetContent side="right" className="overflow-auto">
+          <SheetHeader>
+            <SheetTitle className="text-violet-800">
+              {currentEditedId != null ? "Edit Product" : "Add New Product"}
+            </SheetTitle>
+          </SheetHeader>
+
+          {/* Viewer banner inside sheet */}
+          {isViewer && (
+            <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50 border border-violet-200 text-violet-700 text-sm">
+              <span>🔒</span>
+              <span>View only — You can see the form but cannot make changes.</span>
+            </div>
+          )}
+
+          <div className={isViewer ? "opacity-50 pointer-events-none" : ""}>
             <ProductImageUpload
               imageFile={imageFile}
               setImageFile={setImageFile}
@@ -172,9 +186,9 @@ function AdminProducts() {
                 isBtnDisabled={!isFormValid()}
               />
             </div>
-          </SheetContent>
-        </Sheet>
-      )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

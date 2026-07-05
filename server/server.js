@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const compression = require("compression");
 const authRouter = require("./routes/auth/auth-routes");
 require("dotenv").config();
 const MONGODB_URL = process.env.MONGODB_URL;
@@ -44,6 +45,7 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use(compression()); // Gzip compress all responses — major speed boost on hosted sites
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);

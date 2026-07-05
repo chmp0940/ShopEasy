@@ -116,31 +116,35 @@ function AdminOrderDetails({ orderDetails }) {
             </div>
           </div>
         </div>
-        {/* Only show order status update form for admins */}
-        {user?.role === "admin" && (
-        <div>
-          <CommonForm
-            formControls={[
-              {
-                label: "Order Status",
-                name: "status",
-                componentType: "select",
-                options: [
-                  { id: "pending", label: "Pending" },
-                  { id: "inProcess", label: "InProcess" },
-                  { id: "inShipping", label: "InShipping" },
-                  { id: "delivered", label: "Delivered" },
-                  { id: "rejected", label: "Rejected" },
-                ],
-              },
-            ]}
-            formData={formData}
-            setFormData={setFormData}
-            buttonText={"Update Order Status"}
-            onSubmit={handleUpdatestatus}
-          />
+        <div className={`${user?.role !== "admin" ? "relative group" : ""}`}>
+          <div className={user?.role !== "admin" ? "opacity-50 pointer-events-none" : ""}>
+            <CommonForm
+              formControls={[
+                {
+                  label: "Order Status",
+                  name: "status",
+                  componentType: "select",
+                  options: [
+                    { id: "pending", label: "Pending" },
+                    { id: "inProcess", label: "InProcess" },
+                    { id: "inShipping", label: "InShipping" },
+                    { id: "delivered", label: "Delivered" },
+                    { id: "rejected", label: "Rejected" },
+                  ],
+                },
+              ]}
+              formData={formData}
+              setFormData={setFormData}
+              buttonText={"Update Order Status"}
+              onSubmit={handleUpdatestatus}
+            />
+          </div>
+          {user?.role !== "admin" && (
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block text-sm bg-gray-800 text-white px-3 py-2 rounded-lg whitespace-nowrap z-50 shadow-lg">
+              🔒 View only — Action not allowed
+            </span>
+          )}
         </div>
-        )}
       </div>
     </DialogContent>
   );

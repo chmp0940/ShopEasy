@@ -22,6 +22,9 @@ Files accessible via req.file.buffer
 async function imageUploadUtils(file) {
   const result = await cloudinary.uploader.upload(file, {
     resource_type: "auto", // cloudinary file detects the file type automatically
+    transformation: [
+      { quality: "auto", fetch_format: "auto" }, // auto-optimize quality + format (webp/avif)
+    ],
   });
 
   return result;
