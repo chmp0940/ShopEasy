@@ -1,29 +1,42 @@
 import { Route, Routes } from "react-router-dom";
-import AuthLayout from "./components/auth/layout";
-import AuthLogin from "./pages/auth/login";
-import AuthRegister from "./pages/auth/register";
-import AdminLayout from "./components/admin/layout";
-import AdminDashboard from "./pages/admin/dashboard";
-import AdminProducts from "./pages/admin/products";
-import AdminOrders from "./pages/admin/order";
-import AdminFeatures from "./pages/admin/features";
-import ShoppingLayout from "./components/shop/layout";
-import Notfound from "./pages/not-found";
-import ShoppingHome from "./pages/shop/home";
-import ShoppingCheckout from "./pages/shop/checkout";
-import ShoppingAccount from "./pages/shop/account";
-import ShoppingListing from "./pages/shop/listing";
-import CheckAuth from "./components/common/checkauth";
-import UnauthPage from "./pages/unauth-page";
-import ChooseExperience from "./pages/choose-experience";
+import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
 import { checkAuth, setLoadingFalse } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
-import PaypalReturnPage from "./pages/shop/paypal-return";
-import PaymentSuccessPage from "./pages/shop/payment-success";
-import SearchProducts from "./pages/shop/search";
 import { Toaster } from "@/components/ui/toaster";
+import CheckAuth from "./components/common/checkauth";
+
+// Layouts loaded eagerly (needed immediately)
+import AuthLayout from "./components/auth/layout";
+import AdminLayout from "./components/admin/layout";
+import ShoppingLayout from "./components/shop/layout";
+
+// Pages loaded lazily (only when user navigates to them)
+const AuthLogin = lazy(() => import("./pages/auth/login"));
+const AuthRegister = lazy(() => import("./pages/auth/register"));
+const AdminDashboard = lazy(() => import("./pages/admin/dashboard"));
+const AdminProducts = lazy(() => import("./pages/admin/products"));
+const AdminOrders = lazy(() => import("./pages/admin/order"));
+const AdminFeatures = lazy(() => import("./pages/admin/features"));
+const ShoppingHome = lazy(() => import("./pages/shop/home"));
+const ShoppingCheckout = lazy(() => import("./pages/shop/checkout"));
+const ShoppingAccount = lazy(() => import("./pages/shop/account"));
+const ShoppingListing = lazy(() => import("./pages/shop/listing"));
+const PaypalReturnPage = lazy(() => import("./pages/shop/paypal-return"));
+const PaymentSuccessPage = lazy(() => import("./pages/shop/payment-success"));
+const SearchProducts = lazy(() => import("./pages/shop/search"));
+const ChooseExperience = lazy(() => import("./pages/choose-experience"));
+const UnauthPage = lazy(() => import("./pages/unauth-page"));
+const Notfound = lazy(() => import("./pages/not-found"));
+
+// Fallback spinner for lazy-loaded pages
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
 function App() {
   const { isAuthenticated, user, isLoading } = useSelector(
@@ -62,16 +75,8 @@ function App() {
   }
   return (
     <>
+      <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
-            ></CheckAuth>
-          }
-        />
         <Route
           path="/"
           element={
@@ -132,6 +137,7 @@ function App() {
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
+      </Suspense>
       <Toaster />
     </>
   );

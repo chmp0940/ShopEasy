@@ -98,9 +98,6 @@ const brandWithIcon = [
 
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [brandsLoading, setBrandsLoading] = useState(true);
-  const [heroLoading, setHeroLoading] = useState(true);
   const fallbackSlides = [banner1, banner2, banner3];
   const dispatch = useDispatch();
   const { productList, productDetails, isLoading } = useSelector(
@@ -118,16 +115,7 @@ function ShoppingHome() {
       ? featureImageList
       : fallbackSlides.map((img) => ({ image: img }));
 
-  useEffect(() => {
-    // Simulate initial loading for categories and brands
-    const timer = setTimeout(() => {
-      setCategoriesLoading(false);
-      setBrandsLoading(false);
-      setHeroLoading(false);
-    }, 1500);
 
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     dispatch(getFeatureImage());
@@ -204,10 +192,7 @@ function ShoppingHome() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-orange-50 via-blue-50 to-yellow-50">
-      {heroLoading ? (
-        <HeroSkeleton />
-      ) : (
-        <div className="relative w-full h-[650px] overflow-hidden">
+      <div className="relative w-full h-[650px] overflow-hidden">
           {slides && slides.length > 0
             ? slides.map((slide, index) => (
                 <div
@@ -222,6 +207,7 @@ function ShoppingHome() {
                     src={slide?.image}
                     alt={`Slide ${index + 1}`}
                     className="w-full h-full object-cover"
+                    loading={index === 0 ? "eager" : "lazy"}
                   />
                   {/* Enhanced overlay with multiple gradients */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/30"></div>
@@ -310,20 +296,13 @@ function ShoppingHome() {
           <div className="absolute top-20 right-20 w-20 h-20 bg-gradient-to-r from-blue-400 to-yellow-400 rounded-full opacity-30 animate-pulse"></div>
           <div className="absolute bottom-32 left-16 w-16 h-16 bg-gradient-to-r from-orange-400 to-blue-400 rounded-full opacity-20 animate-bounce"></div>
         </div>
-      )}
       <section className="py-20 bg-gradient-to-r from-blue-100 via-orange-100 to-yellow-100 mt-0">
         <div className="container mx-auto px-4 ">
           <h2 className="text-4xl font-bold text-center  mb-12 bg-gradient-to-r h-[6rem] from-blue-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
             Shop by category
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {categoriesLoading
-              ? // Show skeleton loading for categories
-                Array.from({ length: 5 }).map((_, index) => (
-                  <CategorySkeleton key={index} />
-                ))
-              : // Show actual categories
-                categoriesWithIcon.map((categoryItem) => (
+            {categoriesWithIcon.map((categoryItem) => (
                   <Card
                     key={categoryItem.id}
                     className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm border-2 hover:border-blue-300"
@@ -351,13 +330,7 @@ function ShoppingHome() {
             Shop by Brand
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {brandsLoading
-              ? // Show skeleton loading for brands
-                Array.from({ length: 6 }).map((_, index) => (
-                  <BrandSkeleton key={index} />
-                ))
-              : // Show actual brands
-                brandWithIcon.map((brandItem) => (
+            {brandWithIcon.map((brandItem) => (
                   <Card
                     key={brandItem.id}
                     className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm border-2 hover:border-orange-300"
@@ -370,6 +343,7 @@ function ShoppingHome() {
                         src={brandItem.icon}
                         alt={brandItem.label}
                         className="w-16 h-16 mb-4 object-contain filter hover:brightness-110 transition-all duration-300"
+                        loading="lazy"
                       />
                       <span className="font-bold text-gray-800">
                         {brandItem.label}

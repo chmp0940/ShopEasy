@@ -32,9 +32,8 @@ function AdminDashboard() {
 
   return (
     <div>
-      {/* Only show upload section for admins, not viewers */}
-      {!isViewer && (
-        <>
+      <div className={`${isViewer ? "relative group" : ""}`}>
+        <div className={isViewer ? "opacity-50 pointer-events-none" : ""}>
           <ProductImageUpload
             imageFile={imageFile}
             setImageFile={setImageFile}
@@ -47,12 +46,22 @@ function AdminDashboard() {
           />
           <Button
             onClick={handleUploadFeatureImage}
-            className="mt-5 w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+            disabled={isViewer}
+            className={`mt-5 w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium py-3 rounded-lg shadow-md transition-all duration-300 ${
+              isViewer
+                ? "cursor-not-allowed"
+                : "hover:from-emerald-600 hover:to-teal-700 hover:shadow-lg hover:scale-105"
+            }`}
           >
             Upload
           </Button>
-        </>
-      )}
+        </div>
+        {isViewer && (
+          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden group-hover:block text-sm bg-gray-800 text-white px-3 py-2 rounded-lg whitespace-nowrap z-50 shadow-lg">
+            🔒 View only — Upload not allowed
+          </span>
+        )}
+      </div>
       <div className="flex flex-col gap-4 mt-5">
         {featureImageList && featureImageList.length > 0
           ? featureImageList.map((item) => (
@@ -60,6 +69,7 @@ function AdminDashboard() {
                 <img
                   src={item?.image}
                   className="w-full h-[350px] object-cover rounded-t-lg "
+                  loading="lazy"
                 />
               </div>
             ))
