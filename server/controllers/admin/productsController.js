@@ -82,7 +82,7 @@ const fetchAllProducts = async (req, res) => {
 
 // edit a product
 
-const editProduct = async (req, res) => {
+const editProduct = async (req, res) => {  
   try {
     const { id } = req.params;
     const {

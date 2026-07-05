@@ -116,6 +116,8 @@ function AdminOrderDetails({ orderDetails }) {
             </div>
           </div>
         </div>
+        {/* Only show order status update form for admins */}
+        {user?.role === "admin" && (
         <div>
           <CommonForm
             formControls={[
@@ -138,6 +140,7 @@ function AdminOrderDetails({ orderDetails }) {
             onSubmit={handleUpdatestatus}
           />
         </div>
+        )}
       </div>
     </DialogContent>
   );

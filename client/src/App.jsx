@@ -15,6 +15,7 @@ import ShoppingAccount from "./pages/shop/account";
 import ShoppingListing from "./pages/shop/listing";
 import CheckAuth from "./components/common/checkauth";
 import UnauthPage from "./pages/unauth-page";
+import ChooseExperience from "./pages/choose-experience";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth, setLoadingFalse } from "./store/auth-slice";
@@ -91,6 +92,14 @@ function App() {
           <Route path="login" element={<AuthLogin />} />
           <Route path="register" element={<AuthRegister />} />
         </Route>
+        <Route
+          path="/choose-experience"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <ChooseExperience />
+            </CheckAuth>
+          }
+        />
         <Route
           path="/admin"
           element={

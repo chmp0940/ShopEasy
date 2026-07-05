@@ -8,6 +8,7 @@ function AdminProductTile({
   setCurrentEditedId,
   setOpenCreateProductsDialog,
   handleDelete,
+  isViewer = false,
 }) {
   return (
     <Card className="w-full max-w-sm mx-auto">
@@ -35,26 +36,29 @@ function AdminProductTile({
           </div>
         </CardContent>
       </div>
-      <CardFooter className="flex items-center justify-between gap-2">
-        <Button
-          onClick={() => {
-            setOpenCreateProductsDialog(true);
-            setCurrentEditedId(product?._id);
-            console.log(product);
-            setFormData(product);
-          }}
-          className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-        >
-          Edit
-        </Button>
+      {/* Only show Edit/Delete buttons for admins, not viewers */}
+      {!isViewer && (
+        <CardFooter className="flex items-center justify-between gap-2">
+          <Button
+            onClick={() => {
+              setOpenCreateProductsDialog(true);
+              setCurrentEditedId(product?._id);
+              console.log(product);
+              setFormData(product);
+            }}
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            Edit
+          </Button>
 
-        <Button
-          onClick={() => handleDelete(product?._id)}
-          className="bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-        >
-          Delete
-        </Button>
-      </CardFooter>
+          <Button
+            onClick={() => handleDelete(product?._id)}
+            className="bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            Delete
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

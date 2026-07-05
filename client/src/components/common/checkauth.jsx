@@ -9,15 +9,11 @@ function CheckAuth({ isAuthenticated, user, children }) {
       return <Navigate to="/auth/login" />;
     } else {
       if (user?.role === "admin") {
-        console.log(
-          "authenticated -admin and trying to go to login redirected again to admin"
-        );
+        // Admin goes directly to admin dashboard
         return <Navigate to="/admin/dashboard" />;
       } else {
-        console.log(
-          "authenticated -user and trying to go to login redirected again to shop"
-        );
-        return <Navigate to="/shop/home" />;
+        // Regular users get the choice screen
+        return <Navigate to="/choose-experience" />;
       }
     }
   }
@@ -30,57 +26,28 @@ function CheckAuth({ isAuthenticated, user, children }) {
       location.pathname.includes("/register")
     )
   ) {
-    console.log(
-      "you are not authenticated and your path name doesnt includes login and register"
-    );
     return <Navigate to="/auth/login" />;
   }
 
-  // 2. Authenticated user (not admin) tries to access admin
-  if (
-    isAuthenticated &&
-    user?.role !== "admin" &&
-    location.pathname.startsWith("/admin")
-  ) {
-    console.log(
-      "authenticated -user and trying to go to admin redirected to unauth-page"
-    );
-    return <Navigate to="/unauth-page" />;
-  }
+  // 2. All authenticated users can access /admin/* and /shop/*
+  // Non-admins see admin pages in read-only mode (handled by admin components)
 
-  // 3. Admin tries to access shop
-  if (
-    isAuthenticated &&
-    user?.role === "admin" &&
-    location.pathname.startsWith("/shop")
-  ) {
-    console.log(
-      "authenticated -admin and trying to go to shop redirected to admin"
-    );
-    return <Navigate to="/admin/dashboard" />;
-  }
-
-  // 4. Authenticated user on login/register
+  // 3. Authenticated user on login/register — redirect based on role
   if (
     isAuthenticated &&
     (location.pathname.includes("/login") ||
       location.pathname.includes("/register"))
   ) {
     if (user?.role === "admin") {
-      console.log(
-        "authenticated -admin and trying to go to login redirected again to admin"
-      );
       return <Navigate to="/admin/dashboard" />;
     } else {
-      console.log(
-        "authenticated -user and trying to go to login redirected again to shop"
-      );
-      return <Navigate to="/shop/home" />;
+      return <Navigate to="/choose-experience" />;
     }
   }
 
-  // 5. Otherwise, render children
+  // 4. Otherwise, render children
   return <>{children}</>;
 }
 
 export default CheckAuth;
+

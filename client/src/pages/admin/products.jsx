@@ -41,8 +41,11 @@ function AdminProducts() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const dispatch = useDispatch();
   const { productList } = useSelector((state) => state.adminProducts);
+  const { user } = useSelector((state) => state.auth);
   const { toast } = useToast();
   const [currentEditedId, setCurrentEditedId] = useState(null);
+
+  const isViewer = user?.role !== "admin";
 
   function onSubmit(event) {
     event.preventDefault();
@@ -107,14 +110,17 @@ function AdminProducts() {
 
   return (
     <>
-      <div className="mb-5 flex justify-end w-full">
-        <Button
-          onClick={() => setOpenCreateProductsDialog(true)}
-          className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-        >
-          Add new Product
-        </Button>
-      </div>
+      {/* Only show Add Product button for admins */}
+      {!isViewer && (
+        <div className="mb-5 flex justify-end w-full">
+          <Button
+            onClick={() => setOpenCreateProductsDialog(true)}
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            Add new Product
+          </Button>
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
         {productList && productList.length > 0
           ? productList.map((productItem) => (
@@ -124,49 +130,54 @@ function AdminProducts() {
                 setFormData={setFormData}
                 product={productItem}
                 handleDelete={handleDelete}
+                isViewer={isViewer}
               />
             ))
           : null}
       </div>
       {/* // Product List rahegi yaha pe  */}
-      <Sheet
-        open={openCreateProductsDialog}
-        onOpenChange={() => {
-          setCurrentEditedId(null);
-          setFormData(initialFormData);
-          // actually whats happening is that when edit is click then it will show its current items right but when we click the add new button the same thigns get there also as we didn't reset the form so therefore this two are used
-          setOpenCreateProductsDialog(false);
-        }}
-      >
-        <SheetContent side="right" className="overflow-auto">
-          <SheetHeader>
-            <SheetTitle className="text-violet-800">
-              {currentEditedId != null ? "Edit Product" : "Add New Product"}
-            </SheetTitle>
-          </SheetHeader>
-          <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-            uploadedImageUrl={uploadedImageUrl}
-            setUploadedImageUrl={setUploadedImageUrl}
-            setImageLoadingState={setImageLoadingState}
-            imageLoadingState={imageLoadingState}
-            isEditMode={currentEditedId !== null}
-          />
-          <div className="py-6">
-            <CommonForm
-              onSubmit={onSubmit}
-              formData={formData}
-              setFormData={setFormData}
-              buttonText={currentEditedId !== null ? "Edit" : "Add"}
-              formControls={addProductFormElements}
-              isBtnDisabled={!isFormValid()}
+      {/* Only render the Sheet for admins */}
+      {!isViewer && (
+        <Sheet
+          open={openCreateProductsDialog}
+          onOpenChange={() => {
+            setCurrentEditedId(null);
+            setFormData(initialFormData);
+            // actually whats happening is that when edit is click then it will show its current items right but when we click the add new button the same thigns get there also as we didn't reset the form so therefore this two are used
+            setOpenCreateProductsDialog(false);
+          }}
+        >
+          <SheetContent side="right" className="overflow-auto">
+            <SheetHeader>
+              <SheetTitle className="text-violet-800">
+                {currentEditedId != null ? "Edit Product" : "Add New Product"}
+              </SheetTitle>
+            </SheetHeader>
+            <ProductImageUpload
+              imageFile={imageFile}
+              setImageFile={setImageFile}
+              uploadedImageUrl={uploadedImageUrl}
+              setUploadedImageUrl={setUploadedImageUrl}
+              setImageLoadingState={setImageLoadingState}
+              imageLoadingState={imageLoadingState}
+              isEditMode={currentEditedId !== null}
             />
-          </div>
-        </SheetContent>
-      </Sheet>
+            <div className="py-6">
+              <CommonForm
+                onSubmit={onSubmit}
+                formData={formData}
+                setFormData={setFormData}
+                buttonText={currentEditedId !== null ? "Edit" : "Add"}
+                formControls={addProductFormElements}
+                isBtnDisabled={!isFormValid()}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }
 
 export default AdminProducts;
+
