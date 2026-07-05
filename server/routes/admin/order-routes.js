@@ -4,11 +4,15 @@ const {
   getOrderDetailsForAdmin,
   updateOrderStatus,
 } = require("../../controllers/admin/order-controller");
+const { adminOnly } = require("../../middlewares/auth-middleware");
 
 const router = express.Router();
 
+// Read routes — open to both admin and viewer
 router.get("/get", getAllOrdersByUser);
 router.get("/details/:id", getOrderDetailsForAdmin);
-router.put('/update/:id',updateOrderStatus)
+
+// Write route — admin only (viewers blocked at server level)
+router.put('/update/:id', adminOnly, updateOrderStatus);
 
 module.exports = router;

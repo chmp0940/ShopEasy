@@ -1,13 +1,16 @@
-import { AlignJustify, LogOut } from "lucide-react";
+import { AlignJustify, Eye, LogOut } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, resetTokenAndCredentials } from "@/store/auth-slice";
 import { useNavigate } from "react-router-dom";
 
 function AdminHeader({ setOpen }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const isViewer = user?.role !== "admin";
+
   function handleLogout() {
     // dispatch(logoutUser());
     dispatch(resetTokenAndCredentials());
@@ -24,6 +27,20 @@ function AdminHeader({ setOpen }) {
         <AlignJustify />
         {/* <span className="sr-only">Toggle Menu</span> as such no spl use of it */}
       </Button>
+
+      {/* Viewer Mode Banner */}
+      {isViewer && (
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-violet-500/10 to-indigo-500/10 border border-violet-500/20">
+          <Eye className="w-4 h-4 text-violet-500" />
+          <span className="text-sm font-medium text-violet-600">
+            View Only Mode
+          </span>
+          <span className="text-xs text-muted-foreground">
+            — Logged in as <strong>{user?.userName}</strong>
+          </span>
+        </div>
+      )}
+
       <div className="flex flex-1 justify-end ">
         <Button
           onClick={handleLogout}

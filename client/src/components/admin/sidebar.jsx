@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
+import { useSelector } from "react-redux";
 
 const adminSidebarMenuItems = [
   {
@@ -52,6 +53,9 @@ function MenuItems({ setOpen }) {
 
 function AdminSidebar({ open, setOpen }) {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const isViewer = user?.role !== "admin";
+
   return (
     <>
       <Sheet open={open} onOpenChange={setOpen}>
@@ -63,6 +67,11 @@ function AdminSidebar({ open, setOpen }) {
                 <span>
                   <h1 className="text-2xl font-extrabold">Admin Panel</h1>
                 </span>
+                {isViewer && (
+                  <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 self-center">
+                    Viewer
+                  </span>
+                )}
               </SheetTitle>
             </SheetHeader>
             <MenuItems setOpen={setOpen} />
@@ -76,6 +85,11 @@ function AdminSidebar({ open, setOpen }) {
         >
           <ChartNoAxesCombined size={30} />
           <h1 className="text-2xl font-extrabold">Admin Panel</h1>
+          {isViewer && (
+            <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700">
+              Viewer
+            </span>
+          )}
         </div>
         <MenuItems />
       </aside>
