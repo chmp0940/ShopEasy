@@ -20,11 +20,15 @@ mongoose
   .connect(MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 10, // Maximum number of connections
-    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
   })
-  .then(() => console.log("MongoDB connected"))
+  .then(() => {
+    console.log("MongoDB connected");
+    // Warm up connection pool — reduces first-query latency
+    mongoose.connection.db.admin().ping();
+  })
   .catch((error) => console.log(error));
 
 const app = express();
@@ -47,7 +51,10 @@ app.use(
 app.use(cookieParser());
 app.use(compression()); // Gzip compress all responses — major speed boost on hosted sites
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint — use with UptimeRobot (free) to prevent cold starts
+// Set it to ping this URL every 14 minutes
+app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/shop/products", shopProductsRouter);

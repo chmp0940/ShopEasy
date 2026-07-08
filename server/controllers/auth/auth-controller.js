@@ -23,8 +23,7 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const saltRounds = process.env.NODE_ENV === "production" ? 10 : 12;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const hashPassword = await bcrypt.hash(password, 4); // Low rounds = fast hashing (portfolio project)
 
     const newUser = new User({
       userName,
@@ -54,7 +53,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    if (!email && !password) {
+    if (!email || !password) {
       return res.status(500).json({
         success: false,
         message: "Pls fill all the details",

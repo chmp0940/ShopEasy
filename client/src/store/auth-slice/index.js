@@ -4,6 +4,20 @@ import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Decode JWT locally — avoids a network round-trip to /check-auth
+function decodeJWT(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    // Check if token is expired
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      return null; // Token expired
+    }
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 const initialState = {
   isAuthenticated: false,
   isLoading: true,
@@ -43,22 +57,24 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Decode token locally instead of calling the server — INSTANT auth check
 export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (token, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`${API_URL}/api/auth/check-auth`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
-        },
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+    const decoded = decodeJWT(token);
+    if (!decoded) {
+      return rejectWithValue({ message: "Unauthorised user!" });
     }
+    return {
+      success: true,
+      message: "Authenticated User",
+      user: {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role,
+        userName: decoded.userName,
+      },
+    };
   }
 );
 
