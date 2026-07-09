@@ -66,9 +66,11 @@ const fetchCartItems = async (req, res) => {
       select: "image title price salePrice",
     });
     if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: "cart not found",
+      return res.status(200).json({
+        success: true,
+        data: {
+          items: [],
+        },
       });
     }
 

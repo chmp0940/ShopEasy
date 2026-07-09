@@ -8,7 +8,7 @@ const initialState = {
   orderDetails: null,
 };
 export const getAllOrderForAdmin = createAsyncThunk(
-  "/order/getAllOrderByUserId",
+  "/order/getAllOrderForAdmin",
   async () => {
     const response = await axios.get(`${API_URL}/api/admin/orders/get`);
 
