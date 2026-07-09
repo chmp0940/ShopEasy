@@ -4,7 +4,6 @@ const UserSchema = new mongoose.Schema({
   userName: {
     type: String,
     required: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -13,11 +12,16 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, // Not required for Google OAuth users
   },
   role: {
     type: String,
     default: "user",
+  },
+  authProvider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
   },
 });
 

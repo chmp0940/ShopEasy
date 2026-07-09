@@ -1,10 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const compression = require("compression");
 const authRouter = require("./routes/auth/auth-routes");
-require("dotenv").config();
 const MONGODB_URL = process.env.MONGODB_URL;
 const adminProductsRouter = require("./routes/admin/products-routes");
 const shopProductsRouter = require("./routes/shop/products-routes");

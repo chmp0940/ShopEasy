@@ -26,6 +26,8 @@ const PaypalReturnPage = lazy(() => import("./pages/shop/paypal-return"));
 const PaymentSuccessPage = lazy(() => import("./pages/shop/payment-success"));
 const SearchProducts = lazy(() => import("./pages/shop/search"));
 const ChooseExperience = lazy(() => import("./pages/choose-experience"));
+const SSOCallback = lazy(() => import("./pages/auth/sso-callback"));
+const GoogleComplete = lazy(() => import("./pages/auth/google-complete"));
 const UnauthPage = lazy(() => import("./pages/unauth-page"));
 const Notfound = lazy(() => import("./pages/not-found"));
 
@@ -86,6 +88,9 @@ function App() {
             ></CheckAuth>
           }
         />
+        {/* SSO callback routes — outside /auth to avoid route conflict with auth layout */}
+        <Route path="/sso-callback" element={<SSOCallback />} />
+        <Route path="/google-complete" element={<GoogleComplete />} />
         <Route
           path="auth"
           element={

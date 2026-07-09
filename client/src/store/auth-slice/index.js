@@ -78,6 +78,29 @@ export const checkAuth = createAsyncThunk(
   }
 );
 
+export const googleLogin = createAsyncThunk(
+  "/auth/google-login",
+  async ({ clerkToken }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/auth/google-login`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${clerkToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data || { message: "Google login failed" }
+      );
+    }
+  }
+);
+
 export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { rejectWithValue }) => {
@@ -194,6 +217,38 @@ const authSlice = createSlice({
           state.token = null;
           sessionStorage.removeItem("token");
         }
+      })
+      .addCase(googleLogin.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.success ? action.payload.user : null;
+        state.isAuthenticated = action.payload.success;
+        state.token = action.payload.token;
+        if (action.payload.token) {
+          sessionStorage.setItem("token", JSON.stringify(action.payload.token));
+        }
+        if (action.payload.success) {
+          toast({
+            title: "Welcome!",
+            description: `Hello ${action.payload.user?.userName}, signed in with Google successfully.`,
+            className: "bg-green-500 text-white",
+          });
+        }
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.token = null;
+        sessionStorage.removeItem("token");
+        toast({
+          title: "Google login failed",
+          description:
+            action.payload?.message || "Could not sign in with Google. Please try again.",
+          variant: "destructive",
+        });
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.isLoading = false;
