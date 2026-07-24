@@ -11,12 +11,14 @@ const initialState = {
 export const addNewProduct = createAsyncThunk(
   "/products/addnewproduct",
   async (formData) => {
+    const token = JSON.parse(sessionStorage.getItem("token"));
     const result = await axios.post(
       `${API_URL}/api/admin/products/add`,
       formData,
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -33,12 +35,14 @@ export const fetchAllProducts = createAsyncThunk(
 export const editProduct = createAsyncThunk(
   "/products/editProduct",
   async ({ id, formData }) => {
+    const token = JSON.parse(sessionStorage.getItem("token"));
     const result = await axios.put(
       `${API_URL}/api/admin/products/edit/${id}`,
       formData,
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -48,8 +52,14 @@ export const editProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
   "/products/deleteProduct",
   async (id) => {
+    const token = JSON.parse(sessionStorage.getItem("token"));
     const result = await axios.delete(
-      `${API_URL}/api/admin/products/delete/${id}`
+      `${API_URL}/api/admin/products/delete/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return result?.data;
   }

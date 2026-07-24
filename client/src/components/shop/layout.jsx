@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import ShoppingHeader from './header'
+import AIChatbot from './ai-chatbot'
 
 function ShoppingLayout() {
   return (
@@ -10,6 +11,8 @@ function ShoppingLayout() {
       <main className="flex flex-col w-full">
         <Outlet />
       </main>
+      {/* AI Shopping Assistant — floats on all shop pages */}
+      <AIChatbot />
     </div>
   );
 }
